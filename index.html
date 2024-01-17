@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Population of City/State</title>
+  </head>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    body {
+      background-color: aquamarine;
+    }
+    .full {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 6rem;
+    }
+    .input {
+      width: 35%;
+      background-color: white;
+      padding: 20px;
+      font-size: 28px;
+      font-family: cursive;
+      border: 0.8mm solid orange;
+      text-align: center;
+      font-weight: 500;
+    }
+    @media screen and (max-width: 500px) {
+      .input {
+        width: 17rem;
+      }
+    }
+
+    .suggestions {
+      position: absolute;
+      top: 11.3rem;
+      left: 32.7%;
+      overflow: hidden;
+      width: 34.5%;
+    }
+    @media screen and (max-width: 500px) {
+      .suggestions {
+        top: 11.3rem;
+        left: 7.5%;
+        overflow: hidden;
+        min-width: 20rem;
+      }
+    }
+    @media screen and (min-width: 420px) and (max-width:450px) {
+      .suggestions {
+        top: 11.3rem;
+        left: 12.7%;
+        overflow: hidden;
+        min-width: 20rem;
+      }
+    }
+    @media screen and (min-width: 400px) and (max-width:420px) {
+      .suggestions {
+        top: 11.3rem;
+        left: 11.5%;
+        overflow: hidden;
+        min-width: 20rem;
+      }
+    }
+    @media screen and (min-width: 340px) and (max-width:365px) {
+      .suggestions {
+        top: 11.3rem;
+        left: 5.5%;
+        overflow: hidden;
+        min-width: 20rem;
+      }
+    }
+    .suggestions li {
+      background: white;
+      list-style: none;
+      border-bottom: 1px solid #d8d8d8;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.14);
+      margin: 0;
+      padding: 20px;
+      transition: background 0.2s;
+      display: flex;
+      justify-content: space-between;
+      text-transform: capitalize;
+    }
+
+    .suggestions li:nth-child(even) {
+      transform: perspective(100px) rotateX(3deg) translateY(2px) scale(1.001);
+      background: linear-gradient(to bottom, #ffffff 0%, #efefef 100%);
+    }
+
+    .suggestions li:nth-child(odd) {
+      transform: perspective(100px) rotateX(-3deg) translateY(3px);
+      background: linear-gradient(to top, #ffffff 0%, #efefef 100%);
+    }
+    li {
+      list-style-type: none;
+    }
+    .city,
+    .population {
+      font-family: cursive;
+      font-size: 1.2rem;
+      width: 20rem;
+    }
+    .population {
+   text-align: right;
+    }
+    .city {
+      width: 40rem;
+    }
+    .h1 {
+      background-color: darkblue;
+      color: antiquewhite;
+      border-radius: 0.2rem;
+    }
+    .heading{
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: rgb(6, 107, 107);
+      text-align: center;
+      width: 20rem;
+      border: 3px dashed rgb(132, 132, 132);
+    }
+
+    @media screen and (max-width: 500px) {
+      .heading{
+        /* border: none; */
+      width: 18rem;
+        top: 6%;
+      }
+    }
+  </style>
+  <body>
+    <h1 class="heading">Cities Population</h1>
+    <div class="full">
+      <input class="input" type="text" placeholder="City or State" />
+      <ul class="suggestions"></ul>
+    </div>
+
+    <script>
+      const endpoint =
+        "https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json";
+
+      const cities = [];
+
+      fetch(endpoint)
+        .then((blob) => blob.json())
+        .then((data) => cities.push(...data));
+
+      function findmatches(wordtomatch, cities) {
+        return cities.filter((place) => {
+          const regex = new RegExp(wordtomatch, "gi");
+          return place.city.match(regex) || place.state.match(regex);
+        });
+      }
+
+      function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      function displaymatches() {
+        const matchArray = findmatches(this.value, cities);
+        const html = matchArray
+          .map((place) => {
+            const regex = new RegExp(this.value, "gi");
+            const cityname = place.city.replace(
+              regex,
+              `<span class="h1">${this.value}</span>`
+            );
+            const statename = place.state.replace(
+              regex,
+              `<span class="h1">${this.value}</span>`
+            );
+            return `
+            <li>
+            <span class="city">${cityname}, ${statename}</span>    
+            <span class="population">${numberWithCommas(
+              place.population
+            )}</span>    
+            </li>`;
+          })
+          .join(" ");
+        suggestions.innerHTML = html;
+      }
+      const input = document.querySelector(".input");
+      const suggestions = document.querySelector(".suggestions");
+
+      input.addEventListener("change", displaymatches);
+      input.addEventListener("keyup ", displaymatches);
+    </script>
+  </body>
+</html>
